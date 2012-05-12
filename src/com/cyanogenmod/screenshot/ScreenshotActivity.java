@@ -32,6 +32,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Matrix;
+import android.hardware.CameraSound;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ public class ScreenshotActivity extends Activity
     static Bitmap mBitmap = null;
     Handler mHander = new Handler();
     String mScreenshotFile;
+    CameraSound mCameraSound;
 
     private static final String SCREENSHOT_BUCKET_NAME =
         Environment.getExternalStorageDirectory().toString()
@@ -61,10 +63,11 @@ public class ScreenshotActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         if (!(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))) {
-            Toast toast = Toast.makeText(ScreenshotActivity.this, getString(R.string.not_mounted), Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(ScreenshotActivity.this, getString(R.string.not_mounted), Toast.LENGTH_SHORT);
             toast.show();
             finish();
         }
+        mCameraSound = new CameraSound();
         mConnection = new MediaScannerConnection(ScreenshotActivity.this, mMediaScannerConnectionClient);
         mConnection.connect();
         takeScreenshot(1);
@@ -145,10 +148,10 @@ public class ScreenshotActivity extends Activity
         }
         catch (Exception ex)
         {
-            Toast toast = Toast.makeText(ScreenshotActivity.this, getString(R.string.toast_error) + " " + ex.getMessage(), Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(ScreenshotActivity.this, getString(R.string.toast_error) + " " + ex.getMessage(), Toast.LENGTH_SHORT);
             toast.show();
         }
-        Toast toast = Toast.makeText(ScreenshotActivity.this, getString(R.string.toast_save_location) + " " + mScreenshotFile,Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(ScreenshotActivity.this, getString(R.string.toast_save_location) + " " + mScreenshotFile,Toast.LENGTH_SHORT);
         toast.show();
 
         mConnection.scanFile(mScreenshotFile, null);
@@ -168,6 +171,7 @@ public class ScreenshotActivity extends Activity
 
     void takeScreenshot(final int delay)
     {
+        mCameraSound.playSound(CameraSound.SHUTTER_CLICK);
         mHander.postDelayed(new Runnable()
         {
             public void run()
